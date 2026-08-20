@@ -1,0 +1,24 @@
+# Node & Build artifacts
+node_modules/
+.build/
+out/
+.tmp/
+*.log
+.DS_Store
+
+# Native & Rust target builds
+native/target/
+repos4Build/
+*.exe
+*.pdb
+*.dll
+
+# Python & Environment
+__pycache__/
+*.pyc
+.venv/
+.uv/
+
+# IDE files
+.vscode/
+!.vscode/settings.json

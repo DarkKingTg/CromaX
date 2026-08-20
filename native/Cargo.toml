@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "repo-map",
+    "bridge",
+]
+resolver = "2"
