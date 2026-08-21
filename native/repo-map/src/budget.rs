@@ -67,7 +67,12 @@ impl BudgetFormatter {
                 format!("{}\n{}", output, file_block)
             };
 
-            if Self::estimate_tokens(&candidate) > token_budget && !output.is_empty() {
+            if Self::estimate_tokens(&candidate) > token_budget {
+                if output.is_empty() {
+                    // Truncate first file block if it exceeds budget on its own
+                    let max_chars = (token_budget as f64 * 3.7) as usize;
+                    output = file_block.chars().take(max_chars).collect();
+                }
                 break;
             }
 

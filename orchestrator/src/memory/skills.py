@@ -32,6 +32,19 @@ class Skill:
         )
 
 
+STOPWORDS = {
+    "a", "an", "the", "and", "or", "but", "if", "because", "as", "what", "which",
+    "this", "that", "these", "those", "then", "just", "so", "than", "such", "both",
+    "through", "about", "against", "between", "into", "throughout", "during", "before",
+    "after", "above", "below", "to", "from", "up", "upon", "down", "in", "out", "on",
+    "off", "over", "under", "again", "further", "then", "once", "here", "there", "when",
+    "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other",
+    "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very",
+    "can", "will", "should", "now", "is", "am", "are", "was", "were", "be", "been", "being",
+    "have", "has", "had", "having", "do", "does", "did", "doing", "for", "with", "by", "of",
+}
+
+
 class SkillManager:
     def __init__(self, skills_dir: str | Path) -> None:
         self.skills_dir = Path(skills_dir)
@@ -74,15 +87,19 @@ class SkillManager:
 
     def find_applicable_skills(self, task_prompt: str) -> List[Skill]:
         prompt_lower = task_prompt.lower()
+        prompt_words = set(re.findall(r"\w+", prompt_lower)) - STOPWORDS
         matched: List[Skill] = []
 
         for skill in self.load_all_skills():
-            # Check name or tag matches in prompt
-            if (
-                skill.name.lower() in prompt_lower
-                or any(tag.lower() in prompt_lower for tag in skill.tags)
-                or any(word in prompt_lower for word in skill.description.lower().split())
-            ):
+            # Exact match on skill name or tag
+            if skill.name.lower() in prompt_lower or any(t.lower() in prompt_lower for t in skill.tags if t):
+                matched.append(skill)
+                continue
+
+            # Check non-stopword overlap in description
+            desc_words = set(re.findall(r"\w+", skill.description.lower())) - STOPWORDS
+            overlap = prompt_words & desc_words
+            if len(overlap) >= 2:
                 matched.append(skill)
 
         return matched

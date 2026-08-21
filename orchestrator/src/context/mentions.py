@@ -21,8 +21,9 @@ class ExpandedContext:
 class ContextExpander:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
+        # Put direct file extension pattern first so @main.py matches file before generic tag
         self.mention_pattern = re.compile(
-            r"@([a-zA-Z0-9_\-]+)(?::([^\s]+))?|@([a-zA-Z0-9_\-\./\\]+\.[a-zA-Z0-9]+)"
+            r"@([a-zA-Z0-9_\-\./\\]+\.[a-zA-Z0-9]+)|@([a-zA-Z0-9_\-]+)(?::([^\s]+))?"
         )
 
     def extract_and_expand(self, prompt: str) -> List[ExpandedContext]:
@@ -30,9 +31,9 @@ class ContextExpander:
         expanded: List[ExpandedContext] = []
 
         for match in self.mention_pattern.finditer(prompt):
-            tag_type = match.group(1)
-            target = match.group(2)
-            direct_file = match.group(3)
+            direct_file = match.group(1)
+            tag_type = match.group(2)
+            target = match.group(3)
 
             if direct_file:
                 ctx = self._expand_file(direct_file)
@@ -105,16 +106,33 @@ class ContextExpander:
         )
 
     def _expand_problems(self) -> Optional[ExpandedContext]:
-        # Checks for active diagnostics or test failures
+        res = self.workspace.run_command("git diff --check")
+        problems = res.stdout.strip() if res.stdout else "No git whitespace/syntax warnings detected."
         return ExpandedContext(
             mention_type="problems",
             target="diagnostics",
-            content="--- Active Problems/Diagnostics ---\nNo critical syntax errors detected.",
+            content=f"--- Workspace Problems/Diagnostics ---\n{problems}",
         )
 
     def _expand_symbol(self, symbol_name: str) -> Optional[ExpandedContext]:
+        matches: List[str] = []
+        sym_pattern = re.compile(rf"\b(def|class|function|const|let|var|type|interface)\s+{re.escape(symbol_name)}\b")
+        try:
+            for item in self.workspace.list_dir(""):
+                if item.endswith((".py", ".ts", ".js", ".tsx", ".jsx", ".rs")):
+                    try:
+                        content = self.workspace.read_file(item)
+                        for line_no, line in enumerate(content.splitlines(), start=1):
+                            if sym_pattern.search(line):
+                                matches.append(f"{item}:{line_no}: {line.strip()}")
+                    except Exception:
+                        continue
+        except Exception:
+            pass
+
+        result_text = "\n".join(matches) if matches else f"No definition found for symbol: '{symbol_name}'"
         return ExpandedContext(
             mention_type="symbol",
             target=symbol_name,
-            content=f"--- Symbol Definition: {symbol_name} ---\nTarget symbol referenced in codebase.",
+            content=f"--- Symbol Definition: {symbol_name} ---\n{result_text}",
         )

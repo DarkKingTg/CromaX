@@ -5,6 +5,7 @@
 
 import abc
 import os
+import shlex
 import subprocess
 import time
 from dataclasses import dataclass
@@ -56,7 +57,9 @@ class LocalWorkspace(Workspace):
 
     def _resolve_path(self, rel_path: str) -> Path:
         target = (self.root / rel_path).resolve()
-        if not str(target).startswith(str(self.root)):
+        try:
+            target.relative_to(self.root)
+        except ValueError:
             raise ValueError(f"Path traversal detected outside workspace: {rel_path}")
         return target
 
@@ -87,10 +90,11 @@ class LocalWorkspace(Workspace):
     def run_command(self, command: str, timeout_seconds: int = 60) -> CommandResult:
         start_time = time.time()
         try:
+            cmd_args = shlex.split(command, posix=os.name != "nt") if isinstance(command, str) else command
             proc = subprocess.run(
-                command,
+                cmd_args,
                 cwd=str(self.root),
-                shell=True,
+                shell=False,
                 capture_output=True,
                 text=True,
                 timeout=timeout_seconds,
