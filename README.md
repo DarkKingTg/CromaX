@@ -38,14 +38,22 @@
 
 ##  Quick Start
 
-### Launch CromaX IDE
+### 1. Setup Environment (Fresh Clone)
+If you are cloning CromaX for the first time, run the setup script to fetch the editor shell components:
+
+```powershell
+# Fetch required editor shell resources
+.\scripts\download_repos.ps1
+```
+
+### 2. Launch CromaX IDE
 
 ```cmd
 :: Run the launch script on Windows
 Launch-CromaX.bat
 ```
 
-### Build React UI Components
+### 3. Build React UI Components
 
 ```bash
 cd editor

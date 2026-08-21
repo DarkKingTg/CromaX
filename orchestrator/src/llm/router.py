@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Optional
 
 
 class LLMRouter:
-    def __init__(self, default_model: str = "gemini/gemini-3.6-flash") -> None:
+    def __init__(self, default_model: str = "gemini/gemini-2.0-flash") -> None:
         self.default_model = default_model
 
     def complete(
@@ -65,9 +65,12 @@ class LLMRouter:
             }
 
         except ImportError:
-            # Fallback if litellm is invoked in lightweight stub test environments
-            return {
-                "content": f"[Simulated response for {target_model}]: Completed requested task.",
-                "model": target_model,
-                "usage": {"prompt_tokens": 0, "completion_tokens": 0},
-            }
+            if os.getenv("CROMAX_TESTING") == "1" or os.getenv("PYTEST_CURRENT_TEST"):
+                return {
+                    "content": f"[Simulated response for {target_model}]: Completed requested task.",
+                    "model": target_model,
+                    "usage": {"prompt_tokens": 0, "completion_tokens": 0},
+                }
+            raise RuntimeError(
+                "litellm is not installed in the python environment. Please run 'pip install litellm' or 'uv add litellm'."
+            )
