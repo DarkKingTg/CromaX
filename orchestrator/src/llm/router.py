@@ -3,13 +3,39 @@
 # Model-agnostic LLM router using LiteLLM (BerriAI/litellm, MIT License).
 # Supports Gemini (with thinking level / reasoning effort mapping), Ollama, and OpenRouter.
 
+import json
 import os
+import urllib.request
 from typing import Any, Dict, List, Optional
 
 
 class LLMRouter:
     def __init__(self, default_model: str = "gemini/gemini-2.0-flash") -> None:
         self.default_model = default_model
+
+    @staticmethod
+    def detect_ollama(preferred_host: Optional[str] = None) -> Dict[str, Any]:
+        """Auto-detects active Ollama server IP/URL and queries installed local & cloud models."""
+        candidates = [
+            preferred_host,
+            os.getenv("OLLAMA_HOST"),
+            "http://127.0.0.1:11434",
+            "http://localhost:11434",
+            "http://host.docker.internal:11434",
+        ]
+        for host in filter(None, candidates):
+            if not host.startswith("http://") and not host.startswith("https://"):
+                host = f"http://{host}"
+            try:
+                req = urllib.request.Request(f"{host}/api/tags", method="GET")
+                with urllib.request.urlopen(req, timeout=1.5) as resp:
+                    if resp.status == 200:
+                        data = json.loads(resp.read().decode("utf-8"))
+                        models = [m.get("name") for m in data.get("models", []) if m.get("name")]
+                        return {"status": "online", "endpoint": host, "models": models}
+            except Exception:
+                continue
+        return {"status": "offline", "endpoint": preferred_host or "http://127.0.0.1:11434", "models": []}
 
     def complete(
         self,
