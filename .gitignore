@@ -25,6 +25,18 @@ product.overrides.json
 report/
 repos4Build/
 
+# IDE & AI Agent Directories
+.vscode/
+.voidrules
+.agents/
+.gemini/
+.cursor/
+.windsurf/
+.cline/
+.config/
+.configurations/
+.idx/
+
 # Python / Virtual Envs
 .venv/
 venv/
