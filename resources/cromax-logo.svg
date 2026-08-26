@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cromaxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="50%" stop-color="#a855f7" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Outer Orbit Ring -->
+  <circle cx="50" cy="50" r="42" fill="none" stroke="url(#cromaxGrad)" stroke-width="2.5" opacity="0.3" />
+  
+  <!-- CromaX Modern Geometric Core Symbol -->
+  <path d="M 68,32 A 26,26 0 1,0 68,68 L 56,58 A 12,12 0 1,1 56,42 Z" fill="url(#cromaxGrad)" filter="url(#glow)" />
+  <path d="M 50,20 L 78,50 L 50,80" fill="none" stroke="url(#cromaxGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#glow)" />
+</svg>

@@ -110,12 +110,13 @@ export class PartsSplash {
 	private _removePartsSplash(): void {
 		const cromaxSplash = mainWindow.document.getElementById('cromax-loading-splash');
 		if (cromaxSplash) {
-			cromaxSplash.style.transition = 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+			cromaxSplash.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
 			cromaxSplash.style.opacity = '0';
+			cromaxSplash.style.transform = 'scale(1.05)';
 			cromaxSplash.style.pointerEvents = 'none';
 			setTimeout(() => {
 				cromaxSplash.remove();
-			}, 600);
+			}, 500);
 		}
 
 		const element = mainWindow.document.getElementById(PartsSplash._splashElementId);
