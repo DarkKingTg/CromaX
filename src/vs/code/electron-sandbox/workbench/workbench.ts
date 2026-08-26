@@ -258,6 +258,115 @@
 			window.document.body.appendChild(splash);
 		}
 
+		// Ensure CromaX Loading Overlay is mounted at top z-index on window startup
+		let cromaxSplash = window.document.getElementById('cromax-loading-splash');
+		if (!cromaxSplash) {
+			cromaxSplash = window.document.createElement('div');
+			cromaxSplash.id = 'cromax-loading-splash';
+			cromaxSplash.style.cssText = `
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+				background-color: #0a0b0d;
+				backdrop-filter: blur(20px);
+				-webkit-backdrop-filter: blur(20px);
+				z-index: 9999999;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+				user-select: none;
+				color: #ffffff;
+				box-sizing: border-box;
+			`;
+			cromaxSplash.innerHTML = `
+				<style>
+					@keyframes cromax-spin {
+						0% { transform: rotate(0deg); }
+						100% { transform: rotate(360deg); }
+					}
+					@keyframes cromax-pulse-glow {
+						0% { opacity: 0.6; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.4)); }
+						50% { opacity: 1; filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.8)); }
+						100% { opacity: 0.6; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.4)); }
+					}
+					@keyframes cromax-progress-bar {
+						0% { left: -40%; width: 40%; }
+						50% { left: 25%; width: 50%; }
+						100% { left: 100%; width: 30%; }
+					}
+					.cromax-logo-wrapper {
+						position: relative;
+						width: 88px;
+						height: 88px;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						margin-bottom: 24px;
+					}
+					.cromax-spinner-ring {
+						position: absolute;
+						inset: 0;
+						border-radius: 50%;
+						border: 2px solid transparent;
+						border-top-color: #6366f1;
+						border-right-color: #a855f7;
+						animation: cromax-spin 1.4s linear infinite;
+					}
+					.cromax-logo-img {
+						width: 52px;
+						height: 52px;
+						animation: cromax-pulse-glow 2.5s infinite ease-in-out;
+					}
+					.cromax-brand-name {
+						font-size: 24px;
+						font-weight: 600;
+						letter-spacing: 1.5px;
+						background: linear-gradient(135deg, #ffffff 30%, #a855f7 100%);
+						-webkit-background-clip: text;
+						-webkit-text-fill-color: transparent;
+						margin-bottom: 24px;
+					}
+					.cromax-track {
+						width: 160px;
+						height: 3px;
+						background: rgba(255, 255, 255, 0.08);
+						border-radius: 99px;
+						overflow: hidden;
+						position: relative;
+					}
+					.cromax-fill {
+						position: absolute;
+						height: 100%;
+						background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+						border-radius: 99px;
+						animation: cromax-progress-bar 1.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+					}
+				</style>
+
+				<div class="cromax-logo-wrapper">
+					<div class="cromax-spinner-ring"></div>
+					<!-- Placeholder logo SVG file: resources/cromax-logo.svg -->
+					<img class="cromax-logo-img" src="../../../../../resources/cromax-logo.svg" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="CromaX Logo" />
+					<svg class="cromax-logo-img" style="display:none;" viewBox="0 0 100 100" width="52" height="52">
+						<circle cx="50" cy="50" r="42" fill="none" stroke="#6366f1" stroke-width="3" opacity="0.4" />
+						<path d="M 68,32 A 26,26 0 1,0 68,68 L 56,58 A 12,12 0 1,1 56,42 Z" fill="url(#crmxG)" />
+						<defs><linearGradient id="crmxG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+					</svg>
+				</div>
+
+				<div class="cromax-brand-name">CromaX</div>
+
+				<div class="cromax-track">
+					<div class="cromax-fill"></div>
+				</div>
+			`;
+			window.document.body.appendChild(cromaxSplash);
+		}
+
 		performance.mark('code/didShowPartsSplash');
 	}
 
