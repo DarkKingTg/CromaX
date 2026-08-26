@@ -31,8 +31,11 @@ for %%A in (%*) do (
 )
 
 :: Launch Code
-
-%CODE% . %DISABLE_TEST_EXTENSION% %*
+if "%~1"=="" (
+	%CODE% %DISABLE_TEST_EXTENSION%
+) else (
+	%CODE% %DISABLE_TEST_EXTENSION% %*
+)
 goto end
 
 :builtin
