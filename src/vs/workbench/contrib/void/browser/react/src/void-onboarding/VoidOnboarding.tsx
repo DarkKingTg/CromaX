@@ -20,6 +20,10 @@ export const VoidOnboarding = () => {
 	const voidSettingsState = useSettingsState()
 	const isOnboardingComplete = voidSettingsState.globalSettings.isOnboardingComplete || OVERRIDE_VALUE
 
+	if (isOnboardingComplete) {
+		return null
+	}
+
 	const isDark = useIsDark()
 
 	return (
