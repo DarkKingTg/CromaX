@@ -42,7 +42,7 @@
     "Other"
   ],
   "activationEvents": [
-    "*",
+    "onStartupFinished",
     "onEditSession:file",
     "onFileSystem:git",
     "onFileSystem:git-show"

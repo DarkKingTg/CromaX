@@ -21,13 +21,7 @@
 	],
 	"api": "none",
 	"activationEvents": [
-		"onCommand:openremotewsl.connect",
-		"onCommand:openremotewsl.connectInNewWindow",
-		"onCommand:openremotewsl.connectUsingDistro",
-		"onCommand:openremotewsl.connectUsingDistroInNewWindow",
-		"onCommand:openremotewsl.showLog",
-		"onResolveRemoteAuthority:wsl",
-		"onView:wslTargets"
+		"onResolveRemoteAuthority:wsl"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
