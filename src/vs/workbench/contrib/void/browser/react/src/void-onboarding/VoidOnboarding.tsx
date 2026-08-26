@@ -611,11 +611,21 @@ const VoidOnboardingContent = () => {
 					<FadeIn
 						delayMs={1000}
 					>
-						<PrimaryActionButton
-							onClick={() => { setPageIndex(1) }}
-						>
-							Get Started
-						</PrimaryActionButton>
+						<div className="flex items-center gap-4">
+							<PrimaryActionButton
+								onClick={() => { setPageIndex(1) }}
+							>
+								Get Started
+							</PrimaryActionButton>
+							<button
+								className="px-4 py-2 text-sm text-void-fg-3 hover:text-void-fg-1 border border-void-border-1 rounded-md transition-colors"
+								onClick={() => {
+									voidSettingsService.setGlobalSetting('isOnboardingComplete', true);
+								}}
+							>
+								Skip & Enter CromaX
+							</button>
+						</div>
 					</FadeIn>
 
 				</div>

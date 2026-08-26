@@ -353,16 +353,27 @@ class VoidSettingsService extends Disposable implements IVoidSettingsService {
 		if (!encryptedState)
 			return defaultState()
 
-		const stateStr = await this._encryptionService.decrypt(encryptedState)
-		const state = JSON.parse(stateStr)
-		return state
+		try {
+			const stateStr = await this._encryptionService.decrypt(encryptedState)
+			return JSON.parse(stateStr)
+		} catch (e) {
+			try {
+				return JSON.parse(encryptedState)
+			} catch (e2) {
+				return defaultState()
+			}
+		}
 	}
 
 
 	private async _storeState() {
 		const state = this.state
-		const encryptedState = await this._encryptionService.encrypt(JSON.stringify(state))
-		this._storageService.store(VOID_SETTINGS_STORAGE_KEY, encryptedState, StorageScope.APPLICATION, StorageTarget.USER);
+		try {
+			const encryptedState = await this._encryptionService.encrypt(JSON.stringify(state))
+			this._storageService.store(VOID_SETTINGS_STORAGE_KEY, encryptedState, StorageScope.APPLICATION, StorageTarget.USER);
+		} catch (e) {
+			this._storageService.store(VOID_SETTINGS_STORAGE_KEY, JSON.stringify(state), StorageScope.APPLICATION, StorageTarget.USER);
+		}
 	}
 
 	setSettingOfProvider: SetSettingOfProviderFn = async (providerName, settingName, newVal) => {
