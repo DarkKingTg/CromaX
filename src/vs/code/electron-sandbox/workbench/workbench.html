@@ -155,7 +155,12 @@
 			<div class="cromax-logo-wrapper">
 				<div class="cromax-spinner-ring"></div>
 				<!-- Placeholder logo SVG file: resources/cromax-logo.svg -->
-				<img class="cromax-logo-img" src="../../../../resources/cromax-logo.svg" alt="CromaX Logo" />
+				<img class="cromax-logo-img" src="../../../../../resources/cromax-logo.svg" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" alt="CromaX Logo" />
+				<svg class="cromax-logo-img" style="display:none;" viewBox="0 0 100 100" width="52" height="52">
+					<circle cx="50" cy="50" r="42" fill="none" stroke="#6366f1" stroke-width="3" opacity="0.4" />
+					<path d="M 68,32 A 26,26 0 1,0 68,68 L 56,58 A 12,12 0 1,1 56,42 Z" fill="url(#crmxG)" />
+					<defs><linearGradient id="crmxG" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs>
+				</svg>
 			</div>
 
 			<div class="cromax-brand-name">CromaX</div>

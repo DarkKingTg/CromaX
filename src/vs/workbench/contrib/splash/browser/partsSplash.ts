@@ -42,10 +42,12 @@ export class PartsSplash {
 		@IEditorGroupsService editorGroupsService: IEditorGroupsService,
 		@ILifecycleService lifecycleService: ILifecycleService,
 	) {
-		Event.once(_layoutService.onDidLayoutMainContainer)(() => {
-			this._removePartsSplash();
-			perf.mark('code/didRemovePartsSplash');
-		}, undefined, this._disposables);
+		lifecycleService.when(LifecyclePhase.Restored).then(() => {
+			setTimeout(() => {
+				this._removePartsSplash();
+				perf.mark('code/didRemovePartsSplash');
+			}, 300);
+		});
 
 		const lastIdleSchedule = this._disposables.add(new MutableDisposable());
 		const savePartsSplashSoon = () => {
