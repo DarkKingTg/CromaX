@@ -107,8 +107,12 @@ function removeParcelWatcherPrebuild(dir) {
 	for (const moduleName of parcelModules) {
 		if (moduleName.startsWith('watcher-')) {
 			const modulePath = path.join(parcelModuleFolder, moduleName);
-			fs.rmSync(modulePath, { recursive: true, force: true });
-			log(dir, `Removed @parcel/watcher prebuilt module ${modulePath}`);
+			try {
+				fs.rmSync(modulePath, { recursive: true, force: true });
+				log(dir, `Removed @parcel/watcher prebuilt module ${modulePath}`);
+			} catch (err) {
+				log(dir, `Skipped removing ${modulePath} (file locked)`);
+			}
 		}
 	}
 }

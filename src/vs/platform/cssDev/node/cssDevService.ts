@@ -52,7 +52,7 @@ export class CSSDevelopmentService implements ICSSDevelopmentService {
 			const chunks: string[][] = [];
 			const decoder = new TextDecoder();
 			const basePath = FileAccess.asFileUri('').fsPath;
-			const process = spawn(rg.rgPath, ['-g', '**/*.css', '--files', '--no-ignore', basePath], {});
+			const process = spawn(rg.rgPath, ['-g', '**/*.css', '--files', '--no-ignore', basePath], { shell: true });
 
 			process.stdout.on('data', data => {
 				const chunk = decoder.decode(data, { stream: true });
