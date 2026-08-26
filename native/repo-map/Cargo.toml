@@ -1,0 +1,16 @@
+[package]
+name = "repo-map"
+version = "0.1.0"
+edition = "2021"
+authors = ["CromaX Team"]
+description = "Tree-sitter + PageRank codebase indexing engine ported from Aider (repomap.py)"
+
+[dependencies]
+petgraph = "0.6"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+walkdir = "2.5"
+regex = "1.10"
+
+[dev-dependencies]
+tempfile = "3.10"
