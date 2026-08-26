@@ -10,18 +10,26 @@ import { ServicesAccessor } from '../../../../editor/browser/editorExtensions.js
 import { mountVoidOnboarding } from './react/out/void-onboarding/index.js'
 import { h, getActiveWindow } from '../../../../base/browser/dom.js';
 
+import { IVoidSettingsService } from '../common/voidSettingsService.js';
+
 // Onboarding contribution that mounts the component at startup
 export class OnboardingContribution extends Disposable implements IWorkbenchContribution {
 	static readonly ID = 'workbench.contrib.voidOnboarding';
 
 	constructor(
 		@IInstantiationService private readonly instantiationService: IInstantiationService,
+		@IVoidSettingsService private readonly voidSettingsService: IVoidSettingsService,
 	) {
 		super();
 		this.initialize();
 	}
 
-	private initialize(): void {
+	private async initialize(): Promise<void> {
+		await this.voidSettingsService.waitForInitState;
+
+		if (this.voidSettingsService.state.globalSettings.isOnboardingComplete) {
+			return;
+		}
 		// Get the active window reference for multi-window support
 		const targetWindow = getActiveWindow();
 
