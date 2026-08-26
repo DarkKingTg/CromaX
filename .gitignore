@@ -37,6 +37,18 @@ repos4Build/
 .configurations/
 .idx/
 
+# User Data & Session Storage
+user-data/
+.user-data/
+.vscode-oss-dev/
+User/
+Backups/
+Workspaces/
+*.vscdb
+*.vscdb.backup
+state.vscdb
+storage.json
+
 # Python / Virtual Envs
 .venv/
 venv/
