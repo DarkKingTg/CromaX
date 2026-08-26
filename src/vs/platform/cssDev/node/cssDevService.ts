@@ -11,6 +11,9 @@ import { IEnvironmentService } from '../../environment/common/environment.js';
 import { createDecorator } from '../../instantiation/common/instantiation.js';
 import { ILogService } from '../../log/common/log.js';
 
+import { readdirSync, statSync } from 'fs';
+import { join } from 'path';
+
 export const ICSSDevelopmentService = createDecorator<ICSSDevelopmentService>('ICSSDevelopmentService');
 
 export interface ICSSDevelopmentService {
@@ -44,29 +47,64 @@ export class CSSDevelopmentService implements ICSSDevelopmentService {
 			return [];
 		}
 
-		const rg = await import('@vscode/ripgrep');
-		return await new Promise<string[]>((resolve) => {
+		const basePath = FileAccess.asFileUri('').fsPath;
+		try {
+			const rg = await import('@vscode/ripgrep');
+			return await new Promise<string[]>((resolve) => {
+				const sw = StopWatch.create();
+				const chunks: string[][] = [];
+				const decoder = new TextDecoder();
+				const process = spawn(rg.rgPath, ['-g', '**/*.css', '--files', '--no-ignore', basePath]);
 
-			const sw = StopWatch.create();
+				process.stdout.on('data', data => {
+					const chunk = decoder.decode(data, { stream: true });
+					chunks.push(chunk.split(/\r?\n/).filter(Boolean));
+				});
+				process.on('error', err => {
+					this.logService.error('[CSS_DEV] FAILED to compute CSS data via ripgrep', err);
+					resolve(this.fallbackCssModules(basePath));
+				});
+				process.on('close', () => {
+					const result = chunks.flat().map(p => relative(basePath, p.trim()).replace(/\\/g, '/')).filter(Boolean).sort();
+					if (result.length === 0) {
+						resolve(this.fallbackCssModules(basePath));
+					} else {
+						resolve(result);
+						this.logService.info(`[CSS_DEV] DONE, ${result.length} css modules (${Math.round(sw.elapsed())}ms)`);
+					}
+				});
+			});
+		} catch (err) {
+			this.logService.error('[CSS_DEV] Failed to load ripgrep', err);
+			return this.fallbackCssModules(basePath);
+		}
+	}
 
-			const chunks: string[][] = [];
-			const decoder = new TextDecoder();
-			const basePath = FileAccess.asFileUri('').fsPath;
-			const process = spawn(rg.rgPath, ['-g', '**/*.css', '--files', '--no-ignore', basePath], { shell: true });
+	private fallbackCssModules(basePath: string): string[] {
+		const sw = StopWatch.create();
+		const results: string[] = [];
+		const outDir = join(basePath, 'out');
 
-			process.stdout.on('data', data => {
-				const chunk = decoder.decode(data, { stream: true });
-				chunks.push(chunk.split('\n').filter(Boolean));
-			});
-			process.on('error', err => {
-				this.logService.error('[CSS_DEV] FAILED to compute CSS data', err);
-				resolve([]);
-			});
-			process.on('close', () => {
-				const result = chunks.flat().map(path => relative(basePath, path).replace(/\\/g, '/')).filter(Boolean).sort();
-				resolve(result);
-				this.logService.info(`[CSS_DEV] DONE, ${result.length} css modules (${Math.round(sw.elapsed())}ms)`);
-			});
-		});
+		const scanDir = (dir: string) => {
+			try {
+				const entries = readdirSync(dir);
+				for (const entry of entries) {
+					const fullPath = join(dir, entry);
+					try {
+						const stat = statSync(fullPath);
+						if (stat.isDirectory()) {
+							scanDir(fullPath);
+						} else if (entry.endsWith('.css')) {
+							results.push(relative(basePath, fullPath).replace(/\\/g, '/'));
+						}
+					} catch { }
+				}
+			} catch { }
+		};
+
+		scanDir(outDir);
+		results.sort();
+		this.logService.info(`[CSS_DEV] FALLBACK DONE, ${results.length} css modules (${Math.round(sw.elapsed())}ms)`);
+		return results;
 	}
 }
