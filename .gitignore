@@ -1,0 +1,46 @@
+.DS_Store
+.cache
+npm-debug.log
+*.log
+Thumbs.db
+node_modules/
+.build/
+.vscode/extensions/**/out/
+extensions/**/dist/
+/out*/
+/extensions/**/out/
+build/node_modules
+coverage/
+test_data/
+test-results/
+test-results.xml
+vscode.lsif
+vscode.db
+/.profile-oss
+/cli/target
+/cli/openssl
+product.overrides.json
+*.snap.actual
+.vscode-test
+report/
+repos4Build/
+
+# Python / Virtual Envs
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Rust / Native Build Outputs
+native/target/
+target/
+
+# IDE / Temp
+.vs/
+.tmp/
+.tmp2/
+.tool-versions
+
+# React Build Output
+src/vs/workbench/contrib/void/browser/react/out/**
+src/vs/workbench/contrib/void/browser/react/src2/**
