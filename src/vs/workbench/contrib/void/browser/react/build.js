@@ -150,5 +150,29 @@ if (isWatch) {
 	// Run tsup once
 	execSync('npx tsup', { stdio: 'inherit' });
 
+	// Sync to root out directory
+	try {
+		const rootOutDir = path.resolve(__dirname, '../../../../../../../out/vs/workbench/contrib/void/browser/react/out');
+		const localOutDir = path.resolve(__dirname, 'out');
+		if (fs.existsSync(localOutDir)) {
+			function copyRecursive(src, dest) {
+				if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+				for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+					const srcPath = path.join(src, entry.name);
+					const destPath = path.join(dest, entry.name);
+					if (entry.isDirectory()) {
+						copyRecursive(srcPath, destPath);
+					} else {
+						fs.copyFileSync(srcPath, destPath);
+					}
+				}
+			}
+			copyRecursive(localOutDir, rootOutDir);
+			console.log('✨ Synced react build to main out directory!');
+		}
+	} catch (e) {
+		console.error('⚠️ Error syncing to main out directory:', e);
+	}
+
 	console.log('✅ Build complete!');
 }

@@ -41,70 +41,132 @@
 			data.layoutInfo = undefined;
 		}
 
+		const themeBg = data?.colorInfo?.background || '#090a0f';
+		const themeFg = data?.colorInfo?.foreground || '#ffffff';
+		const isLightTheme = data?.baseTheme === 'vs' || data?.baseTheme === 'hc-light';
+
 		const style = document.createElement('style');
 		style.className = 'cromaxSplashStyles';
 		style.textContent = `
-			body { background-color: #0a0b0d; color: #FFFFFF; margin: 0; padding: 0; overflow: hidden; }
-			@keyframes cromax-spin {
+			body { background-color: ${themeBg} !important; color: ${themeFg}; margin: 0; padding: 0; overflow: hidden; }
+			@keyframes cromax-float {
+				0% { transform: translateY(0px) scale(1); }
+				50% { transform: translateY(-7px) scale(1.02); }
+				100% { transform: translateY(0px) scale(1); }
+			}
+			@keyframes cromax-spin-ring {
 				0% { transform: rotate(0deg); }
 				100% { transform: rotate(360deg); }
 			}
-			@keyframes cromax-pulse-glow {
-				0% { opacity: 0.6; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.4)); }
-				50% { opacity: 1; filter: drop-shadow(0 0 25px rgba(168, 85, 247, 0.8)); }
-				100% { opacity: 0.6; filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.4)); }
+			@keyframes cromax-aura-pulse {
+				0% { opacity: 0.55; transform: scale(0.95); filter: blur(20px); }
+				50% { opacity: 0.95; transform: scale(1.1); filter: blur(30px); }
+				100% { opacity: 0.55; transform: scale(0.95); filter: blur(20px); }
 			}
-			@keyframes cromax-progress-bar {
-				0% { left: -40%; width: 40%; }
-				50% { left: 25%; width: 50%; }
-				100% { left: 100%; width: 30%; }
+			@keyframes cromax-apple-progress {
+				0% { left: -35%; width: 35%; }
+				50% { left: 30%; width: 45%; }
+				100% { left: 100%; width: 25%; }
 			}
-			.cromax-logo-wrapper {
+			.cromax-apple-card {
 				position: relative;
-				width: 88px;
-				height: 88px;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				padding: 44px 56px;
+				border-radius: 38px;
+				background: ${isLightTheme ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.035)'};
+				backdrop-filter: blur(45px) saturate(200%);
+				-webkit-backdrop-filter: blur(45px) saturate(200%);
+				border: 1px solid ${isLightTheme ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.1)'};
+				box-shadow: ${isLightTheme ? '0 20px 60px rgba(0,0,0,0.12)' : '0 30px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.18)'};
+				animation: cromax-float 3.6s ease-in-out infinite;
+			}
+			.cromax-ambient-aura {
+				position: absolute;
+				width: 140px;
+				height: 140px;
+				border-radius: 50%;
+				background: radial-gradient(circle, rgba(168, 85, 247, 0.45) 0%, rgba(99, 102, 241, 0.25) 60%, transparent 100%);
+				animation: cromax-aura-pulse 3.6s ease-in-out infinite;
+				z-index: 0;
+				pointer-events: none;
+			}
+			.cromax-icon-container {
+				position: relative;
+				width: 76px;
+				height: 76px;
+				border-radius: 22px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				margin-bottom: 24px;
+				background: ${isLightTheme ? 'linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.01))' : 'linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03))'};
+				border: 1px solid ${isLightTheme ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.16)'};
+				box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+				margin-bottom: 20px;
+				z-index: 1;
 			}
 			.cromax-spinner-ring {
 				position: absolute;
-				inset: 0;
-				border-radius: 50%;
+				inset: -5px;
+				border-radius: 26px;
 				border: 2px solid transparent;
-				border-top-color: #6366f1;
-				border-right-color: #a855f7;
-				animation: cromax-spin 1.4s linear infinite;
+				border-top-color: #a855f7;
+				border-right-color: #6366f1;
+				border-bottom-color: #ec4899;
+				animation: cromax-spin-ring 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 			}
 			.cromax-logo-img {
-				width: 52px;
-				height: 52px;
-				animation: cromax-pulse-glow 2.5s infinite ease-in-out;
+				width: 46px;
+				height: 46px;
+				position: relative;
+				z-index: 2;
 			}
 			.cromax-brand-name {
-				font-size: 24px;
-				font-weight: 600;
-				letter-spacing: 1.5px;
-				background: linear-gradient(135deg, #ffffff 30%, #a855f7 100%);
+				font-size: 26px;
+				font-weight: 700;
+				letter-spacing: -0.5px;
+				background: ${isLightTheme ? 'linear-gradient(135deg, #1e1e2e 30%, #7c3aed 100%)' : 'linear-gradient(135deg, #ffffff 30%, #d8b4fe 100%)'};
 				-webkit-background-clip: text;
 				-webkit-text-fill-color: transparent;
-				margin-bottom: 24px;
+				margin-bottom: 6px;
+				z-index: 1;
+			}
+			.cromax-status-pill {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				font-size: 11px;
+				font-weight: 600;
+				letter-spacing: 0.6px;
+				text-transform: uppercase;
+				color: ${isLightTheme ? 'rgba(0, 0, 0, 0.55)' : 'rgba(255, 255, 255, 0.55)'};
+				margin-bottom: 22px;
+				z-index: 1;
+			}
+			.cromax-status-dot {
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background-color: #a855f7;
+				box-shadow: 0 0 8px #a855f7;
 			}
 			.cromax-track {
-				width: 160px;
-				height: 3px;
-				background: rgba(255, 255, 255, 0.08);
+				width: 140px;
+				height: 4px;
+				background: ${isLightTheme ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.08)'};
 				border-radius: 99px;
 				overflow: hidden;
 				position: relative;
+				z-index: 1;
 			}
 			.cromax-fill {
 				position: absolute;
 				height: 100%;
 				background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
 				border-radius: 99px;
-				animation: cromax-progress-bar 1.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+				animation: cromax-apple-progress 1.6s infinite cubic-bezier(0.16, 1, 0.3, 1);
 			}
 		`;
 		window.document.head.appendChild(style);
@@ -114,54 +176,77 @@
 			preloadGlobals.webFrame.setZoomLevel(data.zoomLevel);
 		}
 
-		// Render CromaX Glassmorphic Loading Screen as early as possible (Frame 0 splash)
-		const splash = document.createElement('div');
-		splash.id = 'monaco-parts-splash';
-		splash.style.position = 'fixed';
-		splash.style.top = '0';
-		splash.style.left = '0';
-		splash.style.width = '100vw';
-		splash.style.height = '100vh';
-		splash.style.backgroundColor = '#0a0b0d';
-		splash.style.backdropFilter = 'blur(20px)';
-		(splash.style as any).webkitBackdropFilter = 'blur(20px)';
-		splash.style.zIndex = '999999';
-		splash.style.display = 'flex';
-		splash.style.flexDirection = 'column';
-		splash.style.alignItems = 'center';
-		splash.style.justifyContent = 'center';
-		splash.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif";
-		splash.style.userSelect = 'none';
-		splash.style.color = '#ffffff';
+		// Dynamically update existing HTML loading screen or create theme-matched loading screen
+		let splash = window.document.getElementById('cromax-loading-splash');
+		if (splash) {
+			splash.style.backgroundColor = themeBg;
+			splash.style.color = themeFg;
+		} else {
+			splash = document.createElement('div');
+			splash.id = 'cromax-loading-splash';
+			splash.style.position = 'fixed';
+			splash.style.top = '0';
+			splash.style.left = '0';
+			splash.style.width = '100vw';
+			splash.style.height = '100vh';
+			splash.style.backgroundColor = themeBg;
+			splash.style.backgroundImage = 'radial-gradient(circle at 50% 42%, rgba(99, 102, 241, 0.14) 0%, rgba(168, 85, 247, 0.07) 35%, transparent 70%)';
+			splash.style.zIndex = '999999';
+			splash.style.display = 'flex';
+			splash.style.flexDirection = 'column';
+			splash.style.alignItems = 'center';
+			splash.style.justifyContent = 'center';
+			splash.style.fontFamily = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+			splash.style.userSelect = 'none';
+			splash.style.color = themeFg;
+			(splash.style as any).willChange = 'transform, opacity, filter';
 
-		const logoWrapper = document.createElement('div');
-		logoWrapper.className = 'cromax-logo-wrapper';
+			const card = document.createElement('div');
+			card.className = 'cromax-apple-card';
 
-		const spinnerRing = document.createElement('div');
-		spinnerRing.className = 'cromax-spinner-ring';
-		logoWrapper.appendChild(spinnerRing);
+			const aura = document.createElement('div');
+			aura.className = 'cromax-ambient-aura';
+			card.appendChild(aura);
 
-		const logoImg = document.createElement('img');
-		logoImg.className = 'cromax-logo-img';
-		logoImg.src = '../../../../../resources/cromax-logo.svg';
-		logoImg.alt = 'CromaX Logo';
-		logoWrapper.appendChild(logoImg);
+			const iconContainer = document.createElement('div');
+			iconContainer.className = 'cromax-icon-container';
 
-		const brandName = document.createElement('div');
-		brandName.className = 'cromax-brand-name';
-		brandName.textContent = 'CromaX';
+			const spinnerRing = document.createElement('div');
+			spinnerRing.className = 'cromax-spinner-ring';
+			iconContainer.appendChild(spinnerRing);
 
-		const track = document.createElement('div');
-		track.className = 'cromax-track';
-		const fill = document.createElement('div');
-		fill.className = 'cromax-fill';
-		track.appendChild(fill);
+			const logoImg = document.createElement('img');
+			logoImg.className = 'cromax-logo-img';
+			logoImg.src = '../../../../../resources/cromax-logo.svg';
+			logoImg.alt = 'CromaX Logo';
+			iconContainer.appendChild(logoImg);
+			card.appendChild(iconContainer);
 
-		splash.appendChild(logoWrapper);
-		splash.appendChild(brandName);
-		splash.appendChild(track);
+			const brandName = document.createElement('div');
+			brandName.className = 'cromax-brand-name';
+			brandName.textContent = 'CromaX';
+			card.appendChild(brandName);
 
-		window.document.body.appendChild(splash);
+			const statusPill = document.createElement('div');
+			statusPill.className = 'cromax-status-pill';
+			const statusDot = document.createElement('div');
+			statusDot.className = 'cromax-status-dot';
+			const statusText = document.createElement('span');
+			statusText.textContent = 'Studio Engine';
+			statusPill.appendChild(statusDot);
+			statusPill.appendChild(statusText);
+			card.appendChild(statusPill);
+
+			const track = document.createElement('div');
+			track.className = 'cromax-track';
+			const fill = document.createElement('div');
+			fill.className = 'cromax-fill';
+			track.appendChild(fill);
+			card.appendChild(track);
+
+			splash.appendChild(card);
+			window.document.body.appendChild(splash);
+		}
 
 		performance.mark('code/didShowPartsSplash');
 	}

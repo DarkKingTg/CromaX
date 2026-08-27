@@ -8,10 +8,7 @@ pushd %~dp0\..
 :: Get electron, compile, built-in extensions
 if "%VSCODE_SKIP_PRELAUNCH%"=="" node build/lib/preLaunch.js
 
-for /f "tokens=2 delims=:," %%a in ('findstr /R /C:"\"nameShort\":.*" product.json') do set NAMESHORT=%%~a
-set NAMESHORT=%NAMESHORT: "=%
-set NAMESHORT=%NAMESHORT:"=%.exe
-set CODE=".build\electron\%NAMESHORT%"
+set CODE="%~dp0..\.build\electron\CromaX.exe"
 
 :: Manage built-in extensions
 if "%~1"=="--builtin" goto builtin
@@ -31,7 +28,12 @@ for %%A in (%*) do (
 )
 
 :: Launch Code
-%CODE% . %DISABLE_TEST_EXTENSION% %*
+if exist %CODE% (
+    %CODE% . %DISABLE_TEST_EXTENSION% %*
+) else (
+    echo [ERROR] Could not find %CODE%. Please run npm run compile first.
+    pause
+)
 goto end
 
 :builtin

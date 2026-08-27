@@ -112,13 +112,14 @@ export class PartsSplash {
 	private _removePartsSplash(): void {
 		const cromaxSplash = mainWindow.document.getElementById('cromax-loading-splash');
 		if (cromaxSplash) {
-			cromaxSplash.style.transition = 'opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+			cromaxSplash.style.transition = 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.7s cubic-bezier(0.16, 1, 0.3, 1)';
 			cromaxSplash.style.opacity = '0';
-			cromaxSplash.style.transform = 'scale(1.05)';
+			cromaxSplash.style.transform = 'translateY(-100%) scale(0.94)';
+			cromaxSplash.style.filter = 'blur(16px)';
 			cromaxSplash.style.pointerEvents = 'none';
 			setTimeout(() => {
 				cromaxSplash.remove();
-			}, 500);
+			}, 800);
 		}
 
 		const element = mainWindow.document.getElementById(PartsSplash._splashElementId);

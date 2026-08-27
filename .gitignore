@@ -1,46 +1,102 @@
+# Operating System Files
 .DS_Store
-.cache
-npm-debug.log
-*.log
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+*.env
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+id_rsa
+id_ed25519
+secrets.json
+credentials.json
+config.local.json
+
+# Node & Package Managers
 node_modules/
-.build/
-.vscode/extensions/**/out/
-extensions/**/dist/
-/out*/
-/extensions/**/out/
 build/node_modules
+.npm/
+.yarn/
+yarn-error.log*
+yarn-debug.log*
+npm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+
+# Build Outputs & Compilation Artifacts
+.build/
+/out*/
+extensions/**/dist/
+/extensions/**/out/
+.vscode/extensions/**/out/
+src/vs/workbench/contrib/void/browser/react/out/**
+src/vs/workbench/contrib/void/browser/react/src2/**
+src/vs/workbench/contrib/void/browser/react/dist/**
+
+# Rust & Native Build Outputs
+/cli/target
+/cli/openssl
+native/target/
+target/
+
+# Testing & Coverage
 coverage/
+.nyc_output/
 test_data/
 test-results/
 test-results.xml
-vscode.lsif
-vscode.db
-/.profile-oss
-/cli/target
-/cli/openssl
-product.overrides.json
 *.snap.actual
-.vscode-test
 report/
 repos4Build/
 
-# IDE & AI Agent Directories
+# Logs & Temporary Files
+*.log
+logs/
+.tmp/
+.tmp2/
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+.cache
+
+# IDE, Editor & AI Tooling Configurations
 .vscode/
+.idea/
+.vs/
 .voidrules
 .agents/
 .gemini/
 .cursor/
 .windsurf/
 .cline/
+.claude/
+.copilot/
 .config/
 .configurations/
 .idx/
+.tool-versions
 
-# User Data & Session Storage
+# User Data, Local State & Databases
 user-data/
 .user-data/
 .vscode-oss-dev/
+.vscode-test
 User/
 Backups/
 Workspaces/
@@ -48,23 +104,22 @@ Workspaces/
 *.vscdb.backup
 state.vscdb
 storage.json
+vscode.lsif
+vscode.db
+/.profile-oss
+product.overrides.json
+*.sqlite
+*.sqlite3
+*.db
 
-# Python / Virtual Envs
+# Python & Virtual Environments
 .venv/
 venv/
+env/
+ENV/
 __pycache__/
 *.pyc
-
-# Rust / Native Build Outputs
-native/target/
-target/
-
-# IDE / Temp
-.vs/
-.tmp/
-.tmp2/
-.tool-versions
-
-# React Build Output
-src/vs/workbench/contrib/void/browser/react/out/**
-src/vs/workbench/contrib/void/browser/react/src2/**
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

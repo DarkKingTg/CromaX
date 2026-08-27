@@ -5,14 +5,15 @@ echo               Launching CromaX IDE
 echo ========================================================
 echo.
 
-:: Ensure scripts directory exists
-if not exist "scripts\code.bat" (
-    echo [ERROR] Could not find scripts\code.bat.
-    echo Please make sure you are running this from the CromaX root directory.
-    pause
-    exit /b 1
+set VSCODE_DEV=1
+set NODE_ENV=development
+set VSCODE_CLI=1
+
+:: Bypass prelaunch build check if electron binary exists for 0s instant launch
+if exist ".build\electron\CromaX.exe" (
+    set VSCODE_SKIP_PRELAUNCH=1
 )
 
 :: Launch the CromaX code editor shell
 call .\scripts\code.bat %*
-pause
+

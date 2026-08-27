@@ -22,7 +22,7 @@ import { ChatMode, displayInfoOfProviderName, FeatureName, isFeatureNameDisabled
 import { ICommandService } from '../../../../../../../platform/commands/common/commands.js';
 import { WarningBox } from '../void-settings-tsx/WarningBox.js';
 import { getModelCapabilities, getIsReasoningEnabledState } from '../../../../common/modelCapabilities.js';
-import { AlertTriangle, File, Ban, Check, ChevronRight, Dot, FileIcon, Pencil, Undo, Undo2, X, Flag, Copy as CopyIcon, Info, CirclePlus, Ellipsis, CircleEllipsis, Folder, ALargeSmall, TypeOutline, Text } from 'lucide-react';
+import { AlertTriangle, File, Ban, Check, ChevronRight, Dot, FileIcon, Pencil, Undo, Undo2, X, Flag, Copy as CopyIcon, Info, CirclePlus, Ellipsis, CircleEllipsis, Folder, ALargeSmall, TypeOutline, Text, FileText, Terminal, Package, Globe, FileCode } from 'lucide-react';
 import { ChatMessage, CheckpointEntry, StagingSelectionItem, ToolMessage } from '../../../../common/chatThreadServiceTypes.js';
 import { approvalTypeOfBuiltinToolName, BuiltinToolCallParams, BuiltinToolName, ToolName, LintErrorItem, ToolApprovalType, toolApprovalTypes } from '../../../../common/toolsServiceTypes.js';
 import { CopyButton, EditToolAcceptRejectButtonsHTML, IconShell1, JumpToFileButton, JumpToTerminalButton, StatusIndicator, StatusIndicatorForApplyButton, useApplyStreamState, useEditToolStreamState } from '../markdown/ApplyBlockHoverButtons.js';
@@ -35,6 +35,14 @@ import { ToolApprovalTypeSwitch } from '../void-settings-tsx/Settings.js';
 
 import { persistentTerminalNameOfId } from '../../../terminalToolService.js';
 import { removeMCPToolNamePrefix } from '../../../../common/mcpServiceTypes.js';
+
+import { ClaudeThinkingPhrase, CollapsibleThinkingBlock, MessageTokenFooter } from './ClaudeThinkingBlock.js';
+import { VoidChatTabBar, VoidChatTabId } from './VoidChatTabBar.js';
+import { ChangesOverviewPanel } from './ChangesOverviewPanel.js';
+import { TerminalsPanel } from './TerminalsPanel.js';
+import { ArtifactsPanel } from './ArtifactsPanel.js';
+import { BrowserPanel } from './BrowserPanel.js';
+
 
 
 
@@ -137,7 +145,7 @@ export const IconLoading = ({ className = '' }: { className?: string }) => {
 		};
 
 		// Start the animation loop
-		intervalId = setInterval(toggleLoadingText, 300);
+		intervalId = setInterval(toggleLoadingText, 600);
 
 		// Cleanup function to clear the interval when component unmounts
 		return () => clearInterval(intervalId);
@@ -341,15 +349,14 @@ export const VoidChatArea: React.FC<VoidChatAreaProps> = ({
 		<div
 			ref={divRef}
 			className={`
-				gap-x-1
-                flex flex-col p-2 relative input text-left shrink-0
-                rounded-md
-                bg-void-bg-1
+				w-full flex flex-col gap-1.5 p-2 relative text-left shrink-0
+				rounded-[28px]
+				bg-void-bg-1 shadow-xl shadow-black/30
 				transition-all duration-200
-				border border-void-border-3 focus-within:border-void-border-1 hover:border-void-border-1
+				border border-void-border-2 focus-within:border-indigo-500/60 hover:border-void-border-1
 				max-h-[80vh] overflow-y-auto
-                ${className}
-            `}
+				${className}
+			`}
 			onClick={(e) => {
 				onClickAnywhere?.()
 			}}
@@ -364,36 +371,37 @@ export const VoidChatArea: React.FC<VoidChatAreaProps> = ({
 				/>
 			)}
 
-			{/* Input section */}
-			<div className="relative w-full">
-				{children}
-
-				{/* Close button (X) if onClose is provided */}
-				{onClose && (
-					<div className='absolute -top-1 -right-1 cursor-pointer z-1'>
-						<IconX
-							size={12}
-							className="stroke-[2] opacity-80 text-void-fg-3 hover:brightness-95"
-							onClick={onClose}
-						/>
-					</div>
+			{/* Main Horizontal Capsule Bar */}
+			<div className="flex flex-row items-center gap-2 w-full px-1">
+				{/* Left mode indicator */}
+				{featureName === 'Chat' && (
+					<ChatModeDropdown className='text-xs text-void-fg-2 bg-void-bg-2/80 hover:bg-void-bg-2 border border-void-border-2 rounded-full py-1 px-2.5 flex items-center shrink-0 cursor-pointer' />
 				)}
-			</div>
 
-			{/* Bottom row */}
-			<div className='flex flex-row justify-between items-end gap-1'>
-				{showModelDropdown && (
-					<div className='flex flex-col gap-y-1'>
-						<ReasoningOptionSlider featureName={featureName} />
+				{/* Input section */}
+				<div className="relative flex-1 min-w-0 flex items-center">
+					{children}
 
-						<div className='flex items-center flex-wrap gap-x-2 gap-y-1 text-nowrap '>
-							{featureName === 'Chat' && <ChatModeDropdown className='text-xs text-void-fg-3 bg-void-bg-1 border border-void-border-2 rounded py-0.5 px-1' />}
-							<ModelDropdown featureName={featureName} className='text-xs text-void-fg-3 bg-void-bg-1 rounded' />
+					{/* Close button (X) if onClose is provided */}
+					{onClose && (
+						<div className='absolute -top-1 -right-1 cursor-pointer z-10'>
+							<IconX
+								size={12}
+								className="stroke-[2] opacity-80 text-void-fg-3 hover:brightness-95"
+								onClick={onClose}
+							/>
 						</div>
-					</div>
-				)}
+					)}
+				</div>
 
-				<div className="flex items-center gap-2">
+				{/* Controls & Submit on Right */}
+				<div className='flex items-center gap-1.5 shrink-0'>
+					{showModelDropdown && (
+						<div className='flex items-center gap-1.5'>
+							<ReasoningOptionSlider featureName={featureName} />
+							<ModelDropdown featureName={featureName} className='text-xs text-void-fg-2 bg-void-bg-2/80 hover:bg-void-bg-2 border border-void-border-2 rounded-full py-1 px-2.5 cursor-pointer max-w-[130px] truncate' />
+						</div>
+					)}
 
 					{isStreaming && loadingIcon}
 
@@ -406,7 +414,6 @@ export const VoidChatArea: React.FC<VoidChatAreaProps> = ({
 						/>
 					)}
 				</div>
-
 			</div>
 		</div>
 	);
@@ -416,34 +423,32 @@ export const VoidChatArea: React.FC<VoidChatAreaProps> = ({
 
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement>
-const DEFAULT_BUTTON_SIZE = 22;
+const DEFAULT_BUTTON_SIZE = 16;
 export const ButtonSubmit = ({ className, disabled, ...props }: ButtonProps & Required<Pick<ButtonProps, 'disabled'>>) => {
 
 	return <button
 		type='button'
-		className={`rounded-full flex-shrink-0 flex-grow-0 flex items-center justify-center
-			${disabled ? 'bg-vscode-disabled-fg cursor-default' : 'bg-white cursor-pointer'}
+		className={`w-7 h-7 rounded-full flex-shrink-0 flex-grow-0 flex items-center justify-center
+			transition-all duration-150
+			${disabled ? 'bg-zinc-700/40 text-zinc-500 cursor-default' : 'bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer shadow-md'}
 			${className}
 		`}
-		// data-tooltip-id='void-tooltip'
-		// data-tooltip-content={'Send'}
-		// data-tooltip-place='left'
 		{...props}
 	>
-		<IconArrowUp size={DEFAULT_BUTTON_SIZE} className="stroke-[2] p-[2px]" />
+		<IconArrowUp size={DEFAULT_BUTTON_SIZE} className="stroke-[2.5]" />
 	</button>
 }
 
 export const ButtonStop = ({ className, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) => {
 	return <button
-		className={`rounded-full flex-shrink-0 flex-grow-0 cursor-pointer flex items-center justify-center
-			bg-white
+		className={`w-7 h-7 rounded-full flex-shrink-0 flex-grow-0 cursor-pointer flex items-center justify-center
+			bg-indigo-600 text-white shadow-md
 			${className}
 		`}
 		type='button'
 		{...props}
 	>
-		<IconSquare size={DEFAULT_BUTTON_SIZE} className="stroke-[3] p-[7px]" />
+		<IconSquare size={12} className="stroke-[2.5]" />
 	</button>
 }
 
@@ -1328,7 +1333,6 @@ const AssistantMessageComponent = ({ chatMessage, isCheckpointGhost, isCommitted
 
 	const reasoningStr = chatMessage.reasoning?.trim() || null
 	const hasReasoning = !!reasoningStr
-	const isDoneReasoning = !!chatMessage.displayContent
 	const thread = chatThreadsService.getCurrentThread()
 
 
@@ -1342,23 +1346,14 @@ const AssistantMessageComponent = ({ chatMessage, isCheckpointGhost, isCommitted
 
 	return <>
 		{/* reasoning token */}
-		{hasReasoning &&
+		{hasReasoning && (
 			<div className={`${isCheckpointGhost ? 'opacity-50' : ''}`}>
-				<ReasoningWrapper isDoneReasoning={isDoneReasoning} isStreaming={!isCommitted}>
-					<SmallProseWrapper>
-						<ChatMarkdownRender
-							string={reasoningStr}
-							chatMessageLocation={chatMessageLocation}
-							isApplyEnabled={false}
-							isLinkDetectionEnabled={true}
-						/>
-					</SmallProseWrapper>
-				</ReasoningWrapper>
+				<CollapsibleThinkingBlock reasoning={reasoningStr} isRunning={!isCommitted} />
 			</div>
-		}
+		)}
 
 		{/* assistant message */}
-		{chatMessage.displayContent &&
+		{chatMessage.displayContent && (
 			<div className={`${isCheckpointGhost ? 'opacity-50' : ''}`}>
 				<ProseWrapper>
 					<ChatMarkdownRender
@@ -1368,8 +1363,9 @@ const AssistantMessageComponent = ({ chatMessage, isCheckpointGhost, isCommitted
 						isLinkDetectionEnabled={true}
 					/>
 				</ProseWrapper>
+				<MessageTokenFooter displayContent={chatMessage.displayContent || ''} reasoning={reasoningStr || undefined} />
 			</div>
-		}
+		)}
 	</>
 
 }
@@ -2579,7 +2575,7 @@ const _ChatBubble = ({ threadId, chatMessage, currCheckpointIdx, isCommitted, me
 
 }
 
-const CommandBarInChat = () => {
+const CommandBarInChat = ({ activeTab, setActiveTab, numTerminals }: { activeTab?: VoidChatTabId; setActiveTab?: (tab: VoidChatTabId) => void; numTerminals?: number }) => {
 	const { stateOfURI: commandBarStateOfURI, sortedURIs: sortedCommandBarURIs } = useCommandBarState()
 	const numFilesChanged = sortedCommandBarURIs.length
 
@@ -2798,6 +2794,13 @@ const CommandBarInChat = () => {
 		</button>
 	)
 
+	const iconTabs: { id: VoidChatTabId; title: string; icon: React.FC<{ className?: string }>; badge?: boolean; count?: number }[] = [
+		{ id: 'changes', title: 'Changes Overview', icon: FileText, count: numFilesChanged },
+		{ id: 'terminals', title: 'Terminals', icon: Terminal, count: numTerminals },
+		{ id: 'artifacts', title: 'Artifacts', icon: Package, badge: true },
+		{ id: 'browser', title: 'Browser Preview', icon: Globe },
+	];
+
 	return (
 		<>
 			{/* file details */}
@@ -2807,31 +2810,83 @@ const CommandBarInChat = () => {
 						select-none
 						flex w-full rounded-t-lg bg-void-bg-3
 						text-void-fg-3 text-xs text-nowrap
-
 						overflow-hidden transition-all duration-200 ease-in-out
-						${isFileDetailsOpened ? 'max-h-24' : 'max-h-0'}
+						${isFileDetailsOpened ? 'max-h-24 border-t border-l border-r border-zinc-300/10' : 'max-h-0'}
 					`}
 				>
 					{fileDetailsContent}
 				</div>
 			</div>
-			{/* main content */}
+			{/* main content banner */}
 			<div
 				className={`
 					select-none
 					flex w-full rounded-t-lg bg-void-bg-3
 					text-void-fg-3 text-xs text-nowrap
 					border-t border-l border-r border-zinc-300/10
-
-					px-2 py-1
-					justify-between
+					px-2.5 py-1.5
+					justify-between items-center shadow-sm
 				`}
 			>
-				<div className="flex gap-2 items-center">
-					{fileDetailsButton}
+				{/* Left Side: 4 Antigravity Feature Icons + File Details Toggle */}
+				<div className="flex gap-1.5 items-center">
+					{setActiveTab && iconTabs.map(tab => {
+						const Icon = tab.icon;
+						const isActive = activeTab === tab.id;
+						return (
+							<button
+								key={tab.id}
+								type="button"
+								onClick={() => setActiveTab(isActive ? 'chat' : tab.id)}
+								className={`
+									p-1 rounded transition-all duration-150 relative flex items-center justify-center cursor-pointer
+									${isActive
+										? 'bg-void-bg-1 text-blue-400 border border-void-border-2 shadow-sm'
+										: 'text-void-fg-3 hover:text-void-fg-1 hover:bg-void-bg-2/60 border border-transparent'
+									}
+								`}
+								title={tab.title}
+							>
+								<Icon className={`w-3.5 h-3.5 ${isActive ? 'text-blue-400 stroke-[2.2]' : 'opacity-80'}`} />
+								{tab.badge && (
+									<span className="absolute bottom-0.5 right-0.5 w-1.5 h-1.5 bg-blue-500 rounded-full" />
+								)}
+							</button>
+						);
+					})}
+
+					<div className="ml-1 pl-1.5 border-l border-zinc-700/50 flex items-center">
+						{fileDetailsButton}
+					</div>
 				</div>
+
+				{/* Right Side: Accept/Reject All + Review Changes + Thread Status */}
 				<div className="flex gap-2 items-center">
 					{acceptRejectAllButtons}
+
+					{setActiveTab && (
+						<button
+							type="button"
+							onClick={() => setActiveTab(activeTab === 'changes' ? 'chat' : 'changes')}
+							className={`
+								flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium transition-all cursor-pointer
+								${activeTab === 'changes'
+									? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+									: 'bg-zinc-800/80 hover:bg-zinc-700/80 text-zinc-200 border border-zinc-700/60'
+								}
+							`}
+							title="Review Changes"
+						>
+							<FileCode className="w-3 h-3 text-blue-400" />
+							<span>Review Changes</span>
+							{numFilesChanged > 0 && (
+								<span className="ml-0.5 px-1 text-[10px] rounded-full font-mono bg-blue-500/30 text-blue-300">
+									{numFilesChanged}
+								</span>
+							)}
+						</button>
+					)}
+
 					{threadStatusHTML}
 				</div>
 			</div>
@@ -3011,6 +3066,14 @@ export const SidebarChat = () => {
 			: null
 		: null
 
+	// Top bar tab navigation state
+	const [activeTab, setActiveTab] = useState<VoidChatTabId>('chat');
+
+	const commandBarState = useCommandBarState();
+	const numChanges = commandBarState.sortedURIs.length;
+	const commandToolMessages = previousMessages.filter(m => m.role === 'tool' && (m.name === 'run_command' || m.name === 'run_persistent_command'));
+	const numTerminals = commandToolMessages.length;
+
 	const messagesHTML = <ScrollToBottomContainer
 		key={'messages' + chatThreadsState.currentThreadId} // force rerender on all children if id changes
 		scrollContainerRef={scrollContainerRef}
@@ -3031,9 +3094,11 @@ export const SidebarChat = () => {
 		{generatingTool}
 
 		{/* loading indicator */}
-		{isRunning === 'LLM' || isRunning === 'idle' && !toolIsGenerating ? <ProseWrapper>
-			{<IconLoading className='opacity-50 text-sm' />}
-		</ProseWrapper> : null}
+		{isRunning === 'LLM' || (isRunning === 'idle' && !toolIsGenerating) ? (
+			<div className="py-2 px-1">
+				<ClaudeThinkingPhrase />
+			</div>
+		) : null}
 
 
 		{/* error message */}
@@ -3077,8 +3142,8 @@ export const SidebarChat = () => {
 	>
 		<VoidInputBox2
 			enableAtToMention
-			className={`min-h-[81px] px-0.5 py-0.5`}
-			placeholder={`@ to mention, ${keybindingString ? `${keybindingString} to add a selection. ` : ''}Enter instructions...`}
+			className={`min-h-[26px] py-1 px-1 text-sm bg-transparent border-none outline-none focus:outline-none`}
+			placeholder={`Ask a question... (@ to mention)`}
 			onChangeText={onChangeText}
 			onKeyDown={onKeyDown}
 			onFocus={() => { chatThreadsService.setCurrentlyFocusedMessageIdx(undefined) }}
@@ -3093,74 +3158,102 @@ export const SidebarChat = () => {
 	const isLandingPage = previousMessages.length === 0
 
 
-	const initiallySuggestedPromptsHTML = <div className='flex flex-col gap-2 w-full text-nowrap text-void-fg-3 select-none'>
+	const initiallySuggestedPromptsHTML = <div className='flex flex-wrap gap-2 w-full text-void-fg-2 select-none'>
 		{[
 			'Summarize my codebase',
 			'How do types work in Rust?',
 			'Create a .voidrules file for me'
 		].map((text, index) => (
-			<div
+			<button
 				key={index}
-				className='py-1 px-2 rounded text-sm bg-zinc-700/5 hover:bg-zinc-700/10 dark:bg-zinc-300/5 dark:hover:bg-zinc-300/10 cursor-pointer opacity-80 hover:opacity-100'
+				type='button'
+				className='px-3.5 py-1.5 rounded-full text-xs font-medium bg-void-bg-2/80 hover:bg-void-bg-2 border border-indigo-500/30 hover:border-indigo-500/70 transition-all text-void-fg-1 cursor-pointer flex items-center gap-1.5 shadow-sm'
 				onClick={() => onSubmit(text)}
 			>
-				{text}
-			</div>
+				<span>{text}</span>
+			</button>
 		))}
 	</div>
 
 
 
-	const threadPageInput = <div key={'input' + chatThreadsState.currentThreadId}>
+	//  inline drawer panel when an icon tab is active
+	const activeDrawerPanel = activeTab !== 'chat' ? (
+		<div className="w-full max-h-[50vh] flex flex-col border-t border-b border-void-border-2 bg-void-bg-1 shadow-2xl overflow-hidden shrink-0 transition-all duration-200 ease-in-out">
+			<div className="flex items-center justify-between px-3 py-1 bg-void-bg-2 border-b border-void-border-3 text-[11px] font-medium text-void-fg-3">
+				<span className="capitalize">{activeTab}</span>
+				<button
+					type="button"
+					onClick={() => setActiveTab('chat')}
+					className="text-void-fg-4 hover:text-void-fg-1 p-0.5 rounded hover:bg-void-bg-3 cursor-pointer"
+					title="Close Panel"
+				>
+					<IconX size={11} />
+				</button>
+			</div>
+			<div className="overflow-auto max-h-[45vh]">
+				{activeTab === 'changes' && <ChangesOverviewPanel />}
+				{activeTab === 'terminals' && <TerminalsPanel />}
+				{activeTab === 'artifacts' && <ArtifactsPanel />}
+				{activeTab === 'browser' && <BrowserPanel />}
+			</div>
+		</div>
+	) : null;
+
+	const threadPageInput = <div key={'input' + chatThreadsState.currentThreadId} className="w-full shrink-0">
+		{activeDrawerPanel}
 		<div className='px-4'>
-			<CommandBarInChat />
+			<CommandBarInChat
+				activeTab={activeTab}
+				setActiveTab={setActiveTab}
+				numTerminals={numTerminals}
+			/>
 		</div>
 		<div className='px-2 pb-2'>
 			{inputChatArea}
 		</div>
 	</div>
 
-	const landingPageInput = <div>
-		<div className='pt-8'>
+	const landingPageInput = <div className="w-full shrink-0">
+		{activeDrawerPanel}
+		<div className='px-4'>
+			<CommandBarInChat
+				activeTab={activeTab}
+				setActiveTab={setActiveTab}
+				numTerminals={numTerminals}
+			/>
+		</div>
+		<div>
 			{inputChatArea}
 		</div>
 	</div>
 
-	const landingPageContent = <div
-		ref={sidebarRef}
-		className='w-full h-full max-h-full flex flex-col overflow-auto px-4'
-	>
-		<ErrorBoundary>
-			{landingPageInput}
-		</ErrorBoundary>
+	const landingPageContent = (
+		<div
+			ref={sidebarRef}
+			className='w-full h-full max-h-full flex flex-col justify-center items-center overflow-y-auto px-4 py-8'
+		>
+			<div className="w-full max-w-xl flex flex-col gap-5 items-center justify-center my-auto">
+				<div className="w-full flex flex-col gap-2.5 items-start text-left">
+					<div className='text-void-fg-3 font-medium text-xs px-1 select-none pointer-events-none'>
+						{Object.keys(chatThreadsState.allThreads).length > 1 ? 'Previous Threads' : 'Suggested prompts'}
+					</div>
+					{Object.keys(chatThreadsState.allThreads).length > 1 ? (
+						<PastThreadsList />
+					) : (
+						initiallySuggestedPromptsHTML
+					)}
+				</div>
 
-		{Object.keys(chatThreadsState.allThreads).length > 1 ? // show if there are threads
-			<ErrorBoundary>
-				<div className='pt-8 mb-2 text-void-fg-3 text-root select-none pointer-events-none'>Previous Threads</div>
-				<PastThreadsList />
-			</ErrorBoundary>
-			:
-			<ErrorBoundary>
-				<div className='pt-8 mb-2 text-void-fg-3 text-root select-none pointer-events-none'>Suggestions</div>
-				{initiallySuggestedPromptsHTML}
-			</ErrorBoundary>
-		}
-	</div>
+				<div className="w-full">
+					<ErrorBoundary>
+						{landingPageInput}
+					</ErrorBoundary>
+				</div>
+			</div>
+		</div>
+	);
 
-
-	// const threadPageContent = <div>
-	// 	{/* Thread content */}
-	// 	<div className='flex flex-col overflow-hidden'>
-	// 		<div className={`overflow-hidden ${previousMessages.length === 0 ? 'h-0 max-h-0 pb-2' : ''}`}>
-	// 			<ErrorBoundary>
-	// 				{messagesHTML}
-	// 			</ErrorBoundary>
-	// 		</div>
-	// 		<ErrorBoundary>
-	// 			{inputForm}
-	// 		</ErrorBoundary>
-	// 	</div>
-	// </div>
 	const threadPageContent = <div
 		ref={sidebarRef}
 		className='w-full h-full flex flex-col overflow-hidden'
@@ -3176,11 +3269,10 @@ export const SidebarChat = () => {
 
 
 	return (
-		<Fragment key={threadId} // force rerender when change thread
-		>
-			{isLandingPage ?
-				landingPageContent
-				: threadPageContent}
-		</Fragment>
-	)
+		<div key={threadId} className="w-full h-full flex flex-col overflow-hidden bg-void-bg-1">
+			<div className="flex-1 overflow-hidden relative flex flex-col">
+				{isLandingPage ? landingPageContent : threadPageContent}
+			</div>
+		</div>
+	);
 }

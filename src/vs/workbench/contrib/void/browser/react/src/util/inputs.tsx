@@ -701,11 +701,11 @@ export const VoidInputBox2 = forwardRef<HTMLTextAreaElement, InputBox2Props>(fun
 		const r = textAreaRef.current
 		if (!r) return
 
-		r.style.height = 'auto' // set to auto to reset height, then set to new height
+		r.style.height = '24px' // reset to single-line height for accurate measurement
 
 		if (r.scrollHeight === 0) return requestAnimationFrame(adjustHeight)
 		const h = r.scrollHeight
-		const newHeight = Math.min(h + 1, 500) // plus one to avoid scrollbar appearing when it shouldn't
+		const newHeight = Math.min(Math.max(h, 24), 200)
 		r.style.height = `${newHeight}px`
 	}, []);
 
@@ -735,6 +735,7 @@ export const VoidInputBox2 = forwardRef<HTMLTextAreaElement, InputBox2Props>(fun
 
 	return <>
 		<textarea
+			rows={1}
 			autoFocus={false}
 			ref={useCallback((r: HTMLTextAreaElement | null) => {
 				if (fnsRef)
@@ -753,12 +754,10 @@ export const VoidInputBox2 = forwardRef<HTMLTextAreaElement, InputBox2Props>(fun
 
 			disabled={!isEnabled}
 
-			className={`w-full resize-none max-h-[500px] overflow-y-auto text-void-fg-1 placeholder:text-void-fg-3 ${className}`}
+			className={`w-full resize-none max-h-[200px] overflow-y-auto text-void-fg-1 placeholder:text-void-fg-3 focus:outline-none outline-none ${className}`}
 			style={{
-				// defaultInputBoxStyles
-				background: asCssVariable(inputBackground),
+				background: className?.includes('bg-transparent') ? 'transparent' : asCssVariable(inputBackground),
 				color: asCssVariable(inputForeground)
-				// inputBorder: asCssVariable(inputBorder),
 			}}
 
 			onInput={useCallback((event: React.FormEvent<HTMLTextAreaElement>) => {
@@ -802,7 +801,6 @@ export const VoidInputBox2 = forwardRef<HTMLTextAreaElement, InputBox2Props>(fun
 				onKeyDown?.(e)
 			}, [onKeyDown, onMenuKeyDown, multiline])}
 
-			rows={1}
 			placeholder={placeholder}
 		/>
 		{/* <div>{`idx ${optionIdx}`}</div> */}
